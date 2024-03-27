@@ -6,9 +6,14 @@ local commentMap = {
 	yaml = "# ",
 	go = "// ",
 	javascript = "// ",
+	typescript = "// ",
 	css = {
 		"/* ",
 		" */"
+	},
+	html = {
+		"<!--",
+		"-->"
 	}
 }
 
