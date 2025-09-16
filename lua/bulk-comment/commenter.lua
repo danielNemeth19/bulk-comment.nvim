@@ -24,7 +24,8 @@ local commentMap = {
     htmldjango = {
         "<!--",
         "-->"
-    }
+    },
+    sql = "--"
 }
 
 ---@class Commenter
