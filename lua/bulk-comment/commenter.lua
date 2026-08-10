@@ -5,6 +5,7 @@ local commentMap = {
     python = "# ",
     yaml = "# ",
     go = "// ",
+    kdl = "// ",
     javascript = "// ",
     javascriptreact = "// ",
     typescript = "// ",
@@ -18,6 +19,10 @@ local commentMap = {
         " */"
     },
     c = {
+        "/* ",
+        " */"
+    },
+    cpp = {
         "/* ",
         " */"
     },
