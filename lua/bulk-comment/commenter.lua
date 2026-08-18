@@ -37,9 +37,38 @@ local commentMap = {
     sql = "--"
 }
 
+local revisedMap = {
+    double_dash = {
+        symbol = "// ",
+        languages = {
+            "go",
+            "kdl",
+            "javascrip",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact"
+        }
+    },
+    hash = {
+        symbol = "# ",
+        languages = {
+            "python",
+            "bash",
+            "sh",
+            "zsh",
+            "fish",
+            "ps1",
+            "perl",
+            "yaml",
+            "dockerfile"
+        }
+    }
+}
+
 ---@class Commenter
 ---@field filetype string
----@field symbol any
+---@field symbol string|string[]
+---@field symbol_type string
 local Commenter = {}
 Commenter.__index = Commenter
 
@@ -50,6 +79,8 @@ function Commenter:new(filetype)
     self.__index = self
     self.filetype = filetype
     self.symbol = self:_set_symbol()
+    self.symbol_type = self:_set_symbol_type()
+    print(self.symbol_type)
     return self
 end
 
@@ -57,6 +88,19 @@ end
 function Commenter._set_symbol(self)
     local symbol = commentMap[self.filetype]
     return symbol
+end
+
+---@protected
+function Commenter._set_symbol_type(self)
+    for s_type, config in pairs(revisedMap) do
+        local languages = config.languages
+        for _, language in pairs(languages) do
+            if language == self.filetype then
+                return s_type
+            end
+        end
+    end
+    return ""
 end
 
 --- @param line string
