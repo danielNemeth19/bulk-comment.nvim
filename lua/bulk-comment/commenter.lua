@@ -1,69 +1,6 @@
 table.unpack = table.unpack or unpack
+local revisedMap = require("bulk-comment.config")
 
-local commentMap = {
-    lua = "-- ",
-    python = "# ",
-    yaml = "# ",
-    go = "// ",
-    kdl = "// ",
-    javascript = "// ",
-    javascriptreact = "// ",
-    typescript = "// ",
-    typescriptreact = "// ",
-    sh = "# ",
-    fish = "# ",
-    ps1 = "# ",
-    dockerfile = "# ",
-    css = {
-        "/* ",
-        " */"
-    },
-    c = {
-        "/* ",
-        " */"
-    },
-    cpp = {
-        "/* ",
-        " */"
-    },
-    html = {
-        "<!--",
-        "-->"
-    },
-    htmldjango = {
-        "<!--",
-        "-->"
-    },
-    sql = "--"
-}
-
-local revisedMap = {
-    double_dash = {
-        symbol = "// ",
-        languages = {
-            "go",
-            "kdl",
-            "javascrip",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact"
-        }
-    },
-    hash = {
-        symbol = "# ",
-        languages = {
-            "python",
-            "bash",
-            "sh",
-            "zsh",
-            "fish",
-            "ps1",
-            "perl",
-            "yaml",
-            "dockerfile"
-        }
-    }
-}
 
 ---@class Commenter
 ---@field filetype string
@@ -78,15 +15,14 @@ function Commenter:new(filetype)
     local self = setmetatable({}, Commenter)
     self.__index = self
     self.filetype = filetype
-    self.symbol = self:_set_symbol()
-    self.symbol_type = self:_set_symbol_type()
-    print(self.symbol_type)
+    -- self.symbol = self:_set_symbol()
+    self.symbol = self:_set_symbol_type()
     return self
 end
 
 ---@protected
 function Commenter._set_symbol(self)
-    local symbol = commentMap[self.filetype]
+    local symbol = revisedMap[self.filetype]
     return symbol
 end
 
