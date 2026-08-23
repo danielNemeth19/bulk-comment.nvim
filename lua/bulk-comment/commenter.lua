@@ -1,11 +1,10 @@
 table.unpack = table.unpack or unpack
----@type LineSymbolMap
-local revisedMap = require("bulk-comment.config")
+---@type SymbolMap
+local symbolMap = require("bulk-comment.config")
 
 ---@class Commenter
 ---@field filetype string
----@field line_symbol string|string[]
----@field symbol_type string
+---@field config LanguageConfig
 local Commenter = {}
 Commenter.__index = Commenter
 
@@ -15,23 +14,14 @@ function Commenter:new(filetype)
 	local self = setmetatable({}, Commenter)
 	self.__index = self
 	self.filetype = filetype
-	-- self.symbol = self:_set_symbol()
-	self.line_symbol = self:set_line_symbol(revisedMap)
+	self.config = self:_set_config(symbolMap)
 	return self
 end
 
---- @param symbolMap LineSymbolMap
-function Commenter:set_line_symbol(symbolMap)
-	for _, language_config in pairs(symbolMap) do
-		---@type LanguageConfig
-		local config = language_config
-		for _, language in pairs(config.languages) do
-			if language == self.filetype then
-				return config.symbol
-			end
-		end
-	end
-	return ""
+--- @param map SymbolMap
+function Commenter:_set_config(map)
+  local config = map[self.filetype]
+	return config
 end
 
 --- @param line string
@@ -53,10 +43,10 @@ end
 ---@param num_whitespace integer
 function Commenter:is_commented(line, num_whitespace)
 	local symbol
-	if type(self.line_symbol) == "string" then
-		symbol = self.line_symbol
+	if type(self.line_comment) == "string" then
+		symbol = self.line_comment
 	else
-		symbol = self.line_symbol[1]
+		symbol = self.line_comment[1]
 	end
 	if line:sub(num_whitespace + 1, num_whitespace + symbol:len()) == symbol then
 		return true
@@ -68,16 +58,16 @@ end
 ---@param row integer
 ---@param num_whitespace integer
 function Commenter:add_comment(line, row, num_whitespace)
-	if type(self.line_symbol) == "string" then
+	if type(self.line_comment) == "string" then
 		vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-		vim.api.nvim_put({ self.line_symbol }, "c", false, false)
+		vim.api.nvim_put({ self.line_comment }, "c", false, false)
 	else
 		local endpos = line:len()
 		vim.api.nvim_win_set_cursor(0, { row, endpos })
-		vim.api.nvim_put({ self.line_symbol[2] }, "c", true, false)
+		vim.api.nvim_put({ self.line_comment[2] }, "c", true, false)
 
 		vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-		vim.api.nvim_put({ self.line_symbol[1] }, "c", false, false)
+		vim.api.nvim_put({ self.line_comment[1] }, "c", false, false)
 	end
 end
 
@@ -85,7 +75,7 @@ end
 ---@param row integer
 ---@param num_whitespace integer
 function Commenter:remove_comment(line, row, num_whitespace)
-	if type(self.line_symbol) == "string" then
+	if type(self.line_comment) == "string" then
 		self:remove_inline_comment(row, num_whitespace)
 	else
 		self:remove_block_comment(line, row, num_whitespace)
@@ -100,13 +90,13 @@ function Commenter:remove_inline_comment(row, num_whitespace)
 	-- start_row and end_row is the same as we edit in place
 	local start_row, end_row = row - 1, row - 1
 	local start_col = num_whitespace
-	local end_col = num_whitespace + self.line_symbol:len()
+	local end_col = num_whitespace + self.line_comment:len()
 	vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
 function Commenter:remove_block_comment(line, row, num_whitespace)
-	local start_pos = num_whitespace + self.line_symbol[1]:len() + 1
-	local end_pos = 0 - self.line_symbol[2]:len() - 1
+	local start_pos = num_whitespace + self.line_comment[1]:len() + 1
+	local end_pos = 0 - self.line_comment[2]:len() - 1
 	local new_line = line:sub(start_pos, end_pos)
 	local ws = ""
 	local counter = 0
@@ -136,6 +126,10 @@ function Commenter:toggle_comment()
 	if row ~= total_row_num then
 		vim.api.nvim_win_set_cursor(0, { row + 1, num_whitespace })
 	end
+end
+
+function Commenter:block_toggle_comment()
+  print("activating..?")
 end
 
 return Commenter
