@@ -17,13 +17,13 @@ local lineSymbols = {
 			"go",
 			"kdl",
 			"kotlin",
-            "java",
-			"javascrip",
+			"java",
+			"javascript",
 			"javascriptreact",
-            "php",
-            "scala",
-            "swift",
-            "rust",
+			"php",
+			"scala",
+			"swift",
+			"rust",
 			"typescript",
 			"typescriptreact",
 		},
@@ -66,27 +66,26 @@ local blockSymbols = {
 			"dockerfile",
 		},
 	},
-    dash_star = {
-		symbol = {"/* ", " */"},
-	    languages = {
+	dash_star = {
+		symbol = { "/* ", " */" },
+		languages = {
 			"c",
 			"dart",
 			"go",
 			"kdl",
 			"kotlin",
-            "java",
-			"javascrip",
+			"java",
+			"javascript",
 			"javascriptreact",
-            "php",
-            "scala",
-            "swift",
-            "sql",
-            "rust",
+			"php",
+			"scala",
+			"swift",
+			"sql",
+			"rust",
 			"typescript",
 			"typescriptreact",
 		},
-
-    }
+	},
 }
 
 return lineSymbols

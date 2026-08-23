@@ -6,7 +6,7 @@ M.toggle = function ()
 	local filetype = vim.bo.filetype
 	M['type'] = filetype
 	local commenter = Commenter:new(filetype)
-	if commenter.symbol then
+	if commenter.line_symbol then
 		commenter:toggle_comment()
 	else
 		print("Not yet supported: ".. filetype)

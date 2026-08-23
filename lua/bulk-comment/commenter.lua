@@ -20,12 +20,6 @@ function Commenter:new(filetype)
 	return self
 end
 
----@protected
-function Commenter._set_symbol(self)
-	local symbol = revisedMap[self.filetype]
-	return symbol
-end
-
 --- @param symbolMap LineSymbolMap
 function Commenter:set_line_symbol(symbolMap)
 	for _, language_config in pairs(symbolMap) do
