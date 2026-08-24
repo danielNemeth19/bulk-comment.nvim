@@ -43,10 +43,10 @@ end
 ---@param num_whitespace integer
 function Commenter:is_commented(line, num_whitespace)
 	local symbol
-	if type(self.line_comment) == "string" then
-		symbol = self.line_comment
+	if type(self.config.line_comment) == "string" then
+		symbol = self.config.line_comment
 	else
-		symbol = self.line_comment[1]
+		symbol = self.config.line_comment[1]
 	end
 	if line:sub(num_whitespace + 1, num_whitespace + symbol:len()) == symbol then
 		return true
@@ -58,16 +58,16 @@ end
 ---@param row integer
 ---@param num_whitespace integer
 function Commenter:add_comment(line, row, num_whitespace)
-	if type(self.line_comment) == "string" then
+	if type(self.config.line_comment) == "string" then
 		vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-		vim.api.nvim_put({ self.line_comment }, "c", false, false)
+		vim.api.nvim_put({ self.config.line_comment }, "c", false, false)
 	else
 		local endpos = line:len()
 		vim.api.nvim_win_set_cursor(0, { row, endpos })
-		vim.api.nvim_put({ self.line_comment[2] }, "c", true, false)
+		vim.api.nvim_put({ self.config.line_comment[2] }, "c", true, false)
 
 		vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-		vim.api.nvim_put({ self.line_comment[1] }, "c", false, false)
+		vim.api.nvim_put({ self.config.line_comment[1] }, "c", false, false)
 	end
 end
 
@@ -75,7 +75,7 @@ end
 ---@param row integer
 ---@param num_whitespace integer
 function Commenter:remove_comment(line, row, num_whitespace)
-	if type(self.line_comment) == "string" then
+	if type(self.config.line_comment) == "string" then
 		self:remove_inline_comment(row, num_whitespace)
 	else
 		self:remove_block_comment(line, row, num_whitespace)
@@ -90,13 +90,13 @@ function Commenter:remove_inline_comment(row, num_whitespace)
 	-- start_row and end_row is the same as we edit in place
 	local start_row, end_row = row - 1, row - 1
 	local start_col = num_whitespace
-	local end_col = num_whitespace + self.line_comment:len()
+	local end_col = num_whitespace + self.config.line_comment:len()
 	vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
 function Commenter:remove_block_comment(line, row, num_whitespace)
-	local start_pos = num_whitespace + self.line_comment[1]:len() + 1
-	local end_pos = 0 - self.line_comment[2]:len() - 1
+	local start_pos = num_whitespace + self.config.line_comment[1]:len() + 1
+	local end_pos = 0 - self.config.line_comment[2]:len() - 1
 	local new_line = line:sub(start_pos, end_pos)
 	local ws = ""
 	local counter = 0
