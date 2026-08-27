@@ -130,6 +130,11 @@ end
 
 function Commenter:block_toggle_comment()
   print("activating..?")
+  local bufnr = vim.api.nvim_get_current_buf()
+  local start_pos = vim.fn.getpos("'<'")
+  local end_pos = vim.fn.getpos("'>'")
+  local lines = vim.api.nvim_buf_get_lines(bufnr, start_pos[2]-1, end_pos[2], false)
+  P(lines)
 end
 
 return Commenter
