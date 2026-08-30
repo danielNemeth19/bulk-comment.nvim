@@ -20,7 +20,7 @@ end
 
 --- @param map SymbolMap
 function Commenter:_set_config(map)
-  local config = map[self.filetype]
+	local config = map[self.filetype]
 	return config
 end
 
@@ -39,17 +39,32 @@ function Commenter:is_empty_row(line)
 	return false
 end
 
+---@protected
+---@param line string
+---@param num_whitespace integer
+---@param symbol string
+function Commenter:_is_commented(line, num_whitespace, symbol)
+		local len_symbol = symbol:len()
+		if line:sub(num_whitespace + 1, num_whitespace + len_symbol) == symbol then
+			return true
+		end
+    return false
+end
+
 ---@param line string
 ---@param num_whitespace integer
 function Commenter:is_commented(line, num_whitespace)
-	local symbol
-	if type(self.config.line_comment) == "string" then
-		symbol = self.config.line_comment
-	else
-		symbol = self.config.line_comment[1]
+	if self.config.line_comment then
+		local symbol = assert(self.config.line_comment)
+    if self:_is_commented(line, num_whitespace, symbol) then
+      return true
+    end
 	end
-	if line:sub(num_whitespace + 1, num_whitespace + symbol:len()) == symbol then
-		return true
+	if self.config.block_comment then
+		local symbol = self.config.block_comment[1]
+    if self:_is_commented(line, num_whitespace, symbol) then
+      return true
+    end
 	end
 	return false
 end
@@ -128,13 +143,24 @@ function Commenter:toggle_comment()
 	end
 end
 
+---@protected
+---@param mode string
+function Commenter:_get_line_position(mode)
+	local _, line_number, _, _ = table.unpack(vim.fn.getpos(mode))
+  local zero_based_line_number = line_number - 1
+  return zero_based_line_number
+end
+
 function Commenter:block_toggle_comment()
-  print("activating..?")
-  local bufnr = vim.api.nvim_get_current_buf()
-  local start_pos = vim.fn.getpos("'<'")
-  local end_pos = vim.fn.getpos("'>'")
-  local lines = vim.api.nvim_buf_get_lines(bufnr, start_pos[2]-1, end_pos[2], false)
-  P(lines)
+	local start_line_number = self:_get_line_position("v")
+	local cursor_line_number = self:_get_line_position(".")
+	print("start ln: " .. start_line_number .. " cursor ln: " .. cursor_line_number)
+	if self.config.block_comment then
+    vim.api.nvim_buf_set_lines(0, start_line_number, start_line_number, true, { self.config.block_comment[1]})
+    vim.api.nvim_buf_set_lines(0, cursor_line_number + 2, cursor_line_number + 2, true, { self.config.block_comment[2]})
+	else
+		print("will need to line comment")
+	end
 end
 
 return Commenter

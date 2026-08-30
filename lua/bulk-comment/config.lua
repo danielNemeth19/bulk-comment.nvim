@@ -49,6 +49,10 @@ local symbolMap = {
 		line_comment = nil,
 		block_comment = { "<!-- ", " -->" },
 	},
+	htmldjango = {
+		line_comment = nil,
+		block_comment = { "<!-- ", " -->" },
+	},
 	java = {
 		line_comment = "// ",
 		block_comment = { "/* ", " */" },
