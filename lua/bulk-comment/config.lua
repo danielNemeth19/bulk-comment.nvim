@@ -47,11 +47,11 @@ local symbolMap = {
 	},
 	html = {
 		line_comment = nil,
-		block_comment = { "<!-- ", " -->" },
+		block_comment = { "<!--", "-->" },
 	},
 	htmldjango = {
 		line_comment = nil,
-		block_comment = { "<!-- ", " -->" },
+		block_comment = { "<!--", "-->" },
 	},
 	java = {
 		line_comment = "// ",
@@ -139,7 +139,7 @@ local symbolMap = {
 	},
 	xml = {
 		line_comment = nil,
-		block_comment = { "<!-- ", " -->" },
+		block_comment = { "<!--", "-->" },
 	},
 	yaml = {
 		line_comment = "# ",

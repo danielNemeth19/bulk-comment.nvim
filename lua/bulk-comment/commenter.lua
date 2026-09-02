@@ -45,6 +45,7 @@ end
 ---@param symbol string
 function Commenter:_is_commented(line, num_whitespace, symbol)
 		local len_symbol = symbol:len()
+    local test_string = line:sub(num_whitespace, len_symbol)
 		if line:sub(num_whitespace + 1, num_whitespace + len_symbol) == symbol then
 			return true
 		end
@@ -79,10 +80,10 @@ function Commenter:add_comment(line, row, num_whitespace)
 	else
 		local endpos = line:len()
 		vim.api.nvim_win_set_cursor(0, { row, endpos })
-		vim.api.nvim_put({ self.config.line_comment[2] }, "c", true, false)
+		vim.api.nvim_put({ self.config.block_comment[2] }, "c", true, false)
 
 		vim.api.nvim_win_set_cursor(0, { row, num_whitespace })
-		vim.api.nvim_put({ self.config.line_comment[1] }, "c", false, false)
+		vim.api.nvim_put({ self.config.block_comment[1] }, "c", false, false)
 	end
 end
 
@@ -110,8 +111,8 @@ function Commenter:remove_inline_comment(row, num_whitespace)
 end
 
 function Commenter:remove_block_comment(line, row, num_whitespace)
-	local start_pos = num_whitespace + self.config.line_comment[1]:len() + 1
-	local end_pos = 0 - self.config.line_comment[2]:len() - 1
+	local start_pos = num_whitespace + self.config.block_comment[1]:len() + 1
+	local end_pos = 0 - self.config.block_comment[2]:len() - 1
 	local new_line = line:sub(start_pos, end_pos)
 	local ws = ""
 	local counter = 0
@@ -133,6 +134,7 @@ function Commenter:toggle_comment()
 
 	local num_whitespace = self:count_whitespace(line)
 	if not self:is_commented(line, num_whitespace) then
+    print("if we're here then comment missed")
 		self:add_comment(line, row, num_whitespace)
 	else
 		self:remove_comment(line, row, num_whitespace)
@@ -144,7 +146,7 @@ function Commenter:toggle_comment()
 end
 
 ---@protected
----@param mode string
+---@param mode ("v" | ".")
 function Commenter:_get_line_position(mode)
 	local _, line_number, _, _ = table.unpack(vim.fn.getpos(mode))
   local zero_based_line_number = line_number - 1
