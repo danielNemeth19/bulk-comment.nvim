@@ -11,23 +11,23 @@ local symbolMap = {
 	},
 	c = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	cs = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	css = {
 		line_comment = nil,
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	cpp = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	dart = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	dockerfile = {
 		line_comment = "# ",
@@ -43,7 +43,7 @@ local symbolMap = {
 	},
 	go = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	html = {
 		line_comment = nil,
@@ -55,23 +55,23 @@ local symbolMap = {
 	},
 	java = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	javascript = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	javascriptreact = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	kdl = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	kotlin = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	lisp = {
 		line_comment = "; ",
@@ -91,7 +91,7 @@ local symbolMap = {
 	},
 	php = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	ps1 = {
 		line_comment = "# ",
@@ -107,11 +107,11 @@ local symbolMap = {
 	},
 	rust = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	scala = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	sh = {
 		line_comment = "# ",
@@ -119,19 +119,19 @@ local symbolMap = {
 	},
 	sql = {
 		line_comment = "-- ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	swift = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	typescript = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	typescriptreact = {
 		line_comment = "// ",
-		block_comment = { "/* ", " */" },
+		block_comment = { "/*", "*/" },
 	},
 	vim = {
 		line_comment = '" ',
