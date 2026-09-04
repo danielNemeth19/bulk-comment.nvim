@@ -154,12 +154,14 @@ function Commenter:_get_line_position(mode)
 end
 
 function Commenter:block_toggle_comment()
-	local start_line_number = self:_get_line_position("v")
-	local cursor_line_number = self:_get_line_position(".")
-	print("start ln: " .. start_line_number .. " cursor ln: " .. cursor_line_number)
+	local visual_started_at = self:_get_line_position("v")
+	local cursor_at = self:_get_line_position(".")
+  local from_pos = math.min(visual_started_at, cursor_at)
+  local to_pos = math.max(visual_started_at, cursor_at)
+	print("visual starts at " .. visual_started_at .. " cursor at: " .. cursor_at)
 	if self.config.block_comment then
-    vim.api.nvim_buf_set_lines(0, start_line_number, start_line_number, true, { self.config.block_comment[1]})
-    vim.api.nvim_buf_set_lines(0, cursor_line_number + 2, cursor_line_number + 2, true, { self.config.block_comment[2]})
+    vim.api.nvim_buf_set_lines(0, from_pos, from_pos, true, { self.config.block_comment[1]})
+    vim.api.nvim_buf_set_lines(0, to_pos + 2, to_pos + 2, true, { self.config.block_comment[2]})
 	else
 		print("will need to line comment")
 	end
