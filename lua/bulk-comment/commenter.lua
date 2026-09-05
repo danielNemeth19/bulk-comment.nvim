@@ -45,7 +45,6 @@ end
 ---@param symbol string
 function Commenter:_is_commented(line, num_whitespace, symbol)
 		local len_symbol = symbol:len()
-    local test_string = line:sub(num_whitespace, len_symbol)
 		if line:sub(num_whitespace + 1, num_whitespace + len_symbol) == symbol then
 			return true
 		end
@@ -134,7 +133,6 @@ function Commenter:toggle_comment()
 
 	local num_whitespace = self:count_whitespace(line)
 	if not self:is_commented(line, num_whitespace) then
-    print("if we're here then comment missed")
 		self:add_comment(line, row, num_whitespace)
 	else
 		self:remove_comment(line, row, num_whitespace)
@@ -147,6 +145,7 @@ end
 
 ---@protected
 ---@param mode ("v" | ".")
+---@return integer # Returns 0-based row position to conform with neovim's buffer API
 function Commenter:_get_line_position(mode)
 	local _, line_number, _, _ = table.unpack(vim.fn.getpos(mode))
   local zero_based_line_number = line_number - 1
@@ -158,13 +157,16 @@ function Commenter:block_toggle_comment()
 	local cursor_at = self:_get_line_position(".")
   local from_pos = math.min(visual_started_at, cursor_at)
   local to_pos = math.max(visual_started_at, cursor_at)
-	print("visual starts at " .. visual_started_at .. " cursor at: " .. cursor_at)
+  print("from" .. "to_pos: " .. to_pos)
 	if self.config.block_comment then
     vim.api.nvim_buf_set_lines(0, from_pos, from_pos, true, { self.config.block_comment[1]})
     vim.api.nvim_buf_set_lines(0, to_pos + 2, to_pos + 2, true, { self.config.block_comment[2]})
 	else
 		print("will need to line comment")
 	end
+  local exit_visual = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+  vim.api.nvim_feedkeys(exit_visual, "n", false)
+  -- vim.api.nvim_win_set_cursor(0, {to_pos + 4, 0})
 end
 
 return Commenter
