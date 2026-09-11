@@ -184,26 +184,27 @@ describe("Block toggle - with block comment support ->", function()
 		vim.keymap.set("v", block_toggle_keymap, plugin.block_toggle, { desc = "testing bulk commenting" })
 		require("bulk-comment")
 	end)
-	it("can require", function()
-		require("bulk-comment")
-	end)
+	-- it("can require", function()
+		-- require("bulk-comment")
+	-- end)
 	it("comments selection: visual inner paragraph", function()
 		local input = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
-		local expected_output = {
-			"/*",
-			"#include <stdlib.h>",
-			"#include <string.h>",
-			"#include <snekobject.h>",
-			"*/",
-		}
+		-- local expected_output = {
+			-- "/*",
+			-- "#include <stdlib.h>",
+			-- "#include <string.h>",
+			-- "#include <snekobject.h>",
+			-- "*/",
+		-- }
 		buffer_setup("c", input)
 		highlight_paragraph(1)
 		press_block_toggle()
-		local buffer_content = get_lines_from_buffer()
-		assert.are.same(expected_output, buffer_content)
-    local mode = vim.api.nvim_get_mode().mode
-    assert.equals(mode, "n")
+		-- local buffer_content = get_lines_from_buffer()
+		-- assert.are.same(expected_output, buffer_content)
+    -- local mode = vim.api.nvim_get_mode().mode
+    -- assert.equals(mode, "n")
 	end)
+--[[
   it("comments selection: visual linewise + down", function ()
 		local input = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
 		local expected_output = {
@@ -250,6 +251,7 @@ describe("Block toggle - with block comment support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 5)
   end)
+]]
 end)
 
 

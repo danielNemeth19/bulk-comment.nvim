@@ -157,7 +157,7 @@ function Commenter:block_toggle_comment()
 	local cursor_at = self:_get_line_position(".")
   local from_pos = math.min(visual_started_at, cursor_at)
   local to_pos = math.max(visual_started_at, cursor_at)
-  print("from" .. "to_pos: " .. to_pos)
+  print("from " .. from_pos .. " to_pos: " .. to_pos)
 	if self.config.block_comment then
     vim.api.nvim_buf_set_lines(0, from_pos, from_pos, true, { self.config.block_comment[1]})
     vim.api.nvim_buf_set_lines(0, to_pos + 2, to_pos + 2, true, { self.config.block_comment[2]})
@@ -166,7 +166,7 @@ function Commenter:block_toggle_comment()
 	end
   local exit_visual = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
   vim.api.nvim_feedkeys(exit_visual, "n", false)
-  -- vim.api.nvim_win_set_cursor(0, {to_pos + 4, 0})
+  vim.api.nvim_win_set_cursor(0, {to_pos + 4, 0})
 end
 
 return Commenter
