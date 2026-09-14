@@ -145,28 +145,37 @@ end
 
 ---@protected
 ---@param mode ("v" | ".")
----@return integer # Returns 0-based row position to conform with neovim's buffer API
+---@return integer # Returns 1-based row position
 function Commenter:_get_line_position(mode)
 	local _, line_number, _, _ = table.unpack(vim.fn.getpos(mode))
-  local zero_based_line_number = line_number - 1
-  return zero_based_line_number
+  return line_number
+end
+
+---@param row_num integer
+---@return integer
+function Commenter:to_zero_based(row_num)
+  return row_num - 1
 end
 
 function Commenter:block_toggle_comment()
 	local visual_started_at = self:_get_line_position("v")
 	local cursor_at = self:_get_line_position(".")
-  local from_pos = math.min(visual_started_at, cursor_at)
-  local to_pos = math.max(visual_started_at, cursor_at)
-  print("from " .. from_pos .. " to_pos: " .. to_pos)
+  local v_from = math.min(visual_started_at, cursor_at)
+  local v_to = math.max(visual_started_at, cursor_at)
 	if self.config.block_comment then
-    vim.api.nvim_buf_set_lines(0, from_pos, from_pos, true, { self.config.block_comment[1]})
-    vim.api.nvim_buf_set_lines(0, to_pos + 2, to_pos + 2, true, { self.config.block_comment[2]})
+    vim.api.nvim_buf_set_lines(0, self:to_zero_based(v_from), self:to_zero_based(v_from), true, { self.config.block_comment[1]})
+    vim.api.nvim_buf_set_lines(0, self:to_zero_based(v_to + 2), self:to_zero_based(v_to + 2), true, { self.config.block_comment[2]})
 	else
 		print("will need to line comment")
 	end
   local exit_visual = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
   vim.api.nvim_feedkeys(exit_visual, "n", false)
-  vim.api.nvim_win_set_cursor(0, {to_pos + 4, 0})
+  local total_row_num = vim.api.nvim_buf_line_count(0) -- gives 1-based count
+  if v_to + 2 ~= total_row_num then
+    vim.api.nvim_win_set_cursor(0, {v_to + 3, 0}) -- uses 1-based count
+  else
+    vim.api.nvim_win_set_cursor(0, {v_to + 2, 0})
+  end
 end
 
 return Commenter
