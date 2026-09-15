@@ -79,7 +79,7 @@ local symbolMap = {
 	},
 	lua = {
 		line_comment = "-- ",
-		block_comment = { "--[[", "]]" },
+		block_comment = { "--[=[", "]=]" },
 	},
 	matlab = {
 		line_comment = "% ",

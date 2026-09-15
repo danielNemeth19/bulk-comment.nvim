@@ -242,7 +242,20 @@ describe("Block toggle - with block comment support ->", function()
     local mode = vim.api.nvim_get_mode().mode
     assert.equals(mode, "n")
   end)
-  it("cursor positioning: cursor moved to the end of visual block", function ()
+  it("cursor positioning: cursor moved after block commented block", function ()
+    local input = {
+      "godotenv.Load()",
+      "dbQueries := database.New(db)",
+      "",
+      "serverMux := http.NewServeMux()"
+    }
+    buffer_setup("go", input)
+    highlight_lines_manually(1, "down", 1)
+    press_block_toggle()
+    local active_line = vim.api.nvim_win_get_cursor(0)[1]
+    assert.equals(active_line, 5)
+  end)
+  it("cursor positioning: cursor moved to the closing block comment if at the end of buffer", function ()
 		local input = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
 		buffer_setup("c", input)
 		highlight_paragraph(1)
@@ -250,26 +263,4 @@ describe("Block toggle - with block comment support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 5)
   end)
-  --TODO: needs test for cursor positoning when NOT on last line - also rename above test too
 end)
-
-
-
-
-
---[[
-0 line 1
-1 line 2
-2 line 3
-
-from -> 0
-to -> 2
-
-inserts:
-0 start comment
-1 line 1
-2 line 2
-3 line 3
-4 end comment -> needs to + 2 since, one row will be added before the block
-5 cursor needs to be here
-]]
