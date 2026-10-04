@@ -45,6 +45,7 @@ end
 ---@param symbol string
 function Commenter:_is_commented(line, num_whitespace, symbol)
   local len_symbol = symbol:len()
+  print("len symbol: " .. len_symbol)
   if line:sub(num_whitespace + 1, num_whitespace + len_symbol) == symbol then
     return true
   end
@@ -124,7 +125,6 @@ end
 
 function Commenter:toggle_comment()
   local line = vim.api.nvim_get_current_line()
-
   local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
   if self:is_empty_row(line) then
     vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
@@ -133,8 +133,10 @@ function Commenter:toggle_comment()
 
   local num_whitespace = self:count_whitespace(line)
   if not self:is_commented(line, num_whitespace) then
+    print("commenting out")
     self:add_comment(line, row, num_whitespace)
   else
+    print("uncomment")
     self:remove_comment(line, row, num_whitespace)
   end
   local total_row_num = vim.api.nvim_buf_line_count(0)
@@ -175,6 +177,7 @@ function Commenter:block_toggle_comment()
       vim.api.nvim_win_set_cursor(0, { visual_to + rows_added, 0 })
     end
   else
+    print('visual_from: ' .. visual_from .. ' -> visual_to: ' .. visual_to)
     for i = visual_from, visual_to do
       vim.api.nvim_win_set_cursor(0, { i, 0 })
       self:toggle_comment()
