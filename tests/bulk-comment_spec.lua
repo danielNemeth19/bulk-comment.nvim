@@ -352,4 +352,21 @@ describe("Block toggle - without block comment support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
   end)
+  it("failure case", function()
+    local input = {"import functools", "import pandas as pd"}
+    buffer_setup("python", input)
+
+    -- visually highlighting second row
+    vim.api.nvim_win_set_cursor(0, { 2, 0 })
+    local keypress = vim.api.nvim_replace_termcodes("V", true, false, true)
+    vim.api.nvim_feedkeys(keypress, "x", false)
+    -- exit visual highlight
+    local exit_visual = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+    vim.api.nvim_feedkeys(exit_visual, "n", false)
+
+    highlight_paragraph(1)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    P(buffer_content)
+  end)
 end)

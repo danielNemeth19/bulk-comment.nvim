@@ -1,4 +1,5 @@
 import subprocess
+import functools
 
 
 class ConverterError(Exception):
