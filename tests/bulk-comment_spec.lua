@@ -352,8 +352,12 @@ describe("Block toggle - without block comment support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
   end)
-  it("failure case", function()
+  it("entering-leaving visual mode before trigger should be handled", function()
     local input = {"import functools", "import pandas as pd"}
+    local expected_output = {
+      "# import functools",
+      "# import pandas as pd",
+    }
     buffer_setup("python", input)
 
     -- visually highlighting second row
@@ -367,6 +371,6 @@ describe("Block toggle - without block comment support ->", function()
     highlight_paragraph(1)
     press_block_toggle()
     local buffer_content = get_lines_from_buffer()
-    P(buffer_content)
+    assert.are.same(expected_output, buffer_content)
   end)
 end)

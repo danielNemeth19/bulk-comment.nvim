@@ -69,6 +69,7 @@ function Commenter:is_commented(line, num_whitespace)
   return false
 end
 
+-- TODO: rewrite it with `nvim_buf_set_text`
 ---@param line string
 ---@param row integer
 ---@param num_whitespace integer
@@ -109,6 +110,7 @@ function Commenter:remove_inline_comment(row, num_whitespace)
   vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
+-- TODO: rewrite it with `nvim_buf_set_text`
 function Commenter:remove_block_comment(line, row, num_whitespace)
   local start_pos = num_whitespace + self.config.block_comment[1]:len() + 1
   local end_pos = 0 - self.config.block_comment[2]:len() - 1
@@ -122,6 +124,7 @@ function Commenter:remove_block_comment(line, row, num_whitespace)
   vim.api.nvim_buf_set_lines(0, row - 1, row, true, { ws .. new_line })
 end
 
+-- TODO: consider taking row (1-based line number)
 function Commenter:toggle_comment()
   local line = vim.api.nvim_get_current_line()
   local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
