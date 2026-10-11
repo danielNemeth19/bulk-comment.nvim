@@ -40,7 +40,7 @@ end
 
 describe("Single line toggle - with single line support ->", function()
   local line_toggle_keymap = "lc"
-  local function toggle_line(line)
+  local function press_toggle_line(line)
     vim.api.nvim_win_set_cursor(0, { line, 0 })
     local keypress = vim.api.nvim_replace_termcodes(line_toggle_keymap, true, false, true)
     vim.api.nvim_feedkeys(keypress, "x", false)
@@ -56,7 +56,7 @@ describe("Single line toggle - with single line support ->", function()
     local input = { "function myTest() int {", "myVar := 5" }
     local expected_output = { "// function myTest() int {", "myVar := 5" }
     buffer_setup("go", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -66,7 +66,7 @@ describe("Single line toggle - with single line support ->", function()
     local input = { "  local my_var = 6" }
     local expected_output = { "  -- local my_var = 6" }
     buffer_setup("lua", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
@@ -74,7 +74,7 @@ describe("Single line toggle - with single line support ->", function()
     local input = { "// function myTest() int {" }
     local expected_output = { "function myTest() int {" }
     buffer_setup("go", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
@@ -82,14 +82,14 @@ describe("Single line toggle - with single line support ->", function()
     local input = { "  // myVal := 5" }
     local expected_output = { "  myVal := 5" }
     buffer_setup("go", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
   it("cursor positioning: cursor moved to next row", function()
     local input = { "function myTest() int {", "myVar := 5" }
     buffer_setup("go", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 2)
   end)
@@ -100,15 +100,23 @@ describe("Single line toggle - with single line support ->", function()
       "end",
     }
     buffer_setup("lua", input)
-    toggle_line(3)
+    press_toggle_line(3)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
+  end)
+  it("empty row not modified, cursor moved to next row", function()
+    local input = {"local plugin = require('my-module')", "", "print(a)"}
+    buffer_setup("lua", input)
+    press_toggle_line(2)
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(input, buffer_content)
+    assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
   end)
 end)
 
 describe("Single line toggle - without single line support ->", function()
   local line_toggle_keymap = "lc"
-  local function toggle_line(line)
+  local function press_toggle_line(line)
     vim.api.nvim_win_set_cursor(0, { line, 0 })
     local keypress = vim.api.nvim_replace_termcodes(line_toggle_keymap, true, false, true)
     vim.api.nvim_feedkeys(keypress, "x", false)
@@ -124,7 +132,7 @@ describe("Single line toggle - without single line support ->", function()
     local input = { ".navbar {", "  display: grid;" }
     local expected_output = { "/*.navbar {*/", "  display: grid;" }
     buffer_setup("css", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
@@ -132,7 +140,7 @@ describe("Single line toggle - without single line support ->", function()
     local input = { "  margin-left: auto;" }
     local expected_output = { "  /*margin-left: auto;*/" }
     buffer_setup("css", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
@@ -140,7 +148,7 @@ describe("Single line toggle - without single line support ->", function()
     local input = { "/*.navbar {*/" }
     local expected_output = { ".navbar {" }
     buffer_setup("css", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
@@ -148,14 +156,14 @@ describe("Single line toggle - without single line support ->", function()
     local input = { "  /*margin-left: auto;*/" }
     local expected_output = { "  margin-left: auto;" }
     buffer_setup("css", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
   it("cursor positioning: cursor moved to next row", function()
     local input = { ".navbar {", "  display: grid;" }
     buffer_setup("css", input)
-    toggle_line(1)
+    press_toggle_line(1)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 2)
   end)
@@ -166,9 +174,22 @@ describe("Single line toggle - without single line support ->", function()
       "</html>",
     }
     buffer_setup("html", input)
-    toggle_line(3)
+    press_toggle_line(3)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
+  end)
+  it("empty row not modified, cursor moved to next row", function()
+    local input = {
+      "    </container>",
+      "",
+      "  </body>",
+      "</html>",
+    }
+    buffer_setup("html", input)
+    press_toggle_line(2)
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(input, buffer_content)
+    assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
   end)
 end)
 
