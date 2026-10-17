@@ -130,7 +130,7 @@ describe("Single line toggle - without single line support ->", function()
   end)
   it("comments line: single row", function()
     local input = { ".navbar {", "  display: grid;" }
-    local expected_output = { "/*.navbar {*/", "  display: grid;" }
+    local expected_output = { "/* .navbar { */", "  display: grid;" }
     buffer_setup("css", input)
     press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
@@ -138,14 +138,14 @@ describe("Single line toggle - without single line support ->", function()
   end)
   it("comments line: single row with whitespace", function()
     local input = { "  margin-left: auto;" }
-    local expected_output = { "  /*margin-left: auto;*/" }
+    local expected_output = { "  /* margin-left: auto; */" }
     buffer_setup("css", input)
     press_toggle_line(1)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
   it("uncomments line: single row", function()
-    local input = { "/*.navbar {*/" }
+    local input = { "/* .navbar { */" }
     local expected_output = { ".navbar {" }
     buffer_setup("css", input)
     press_toggle_line(1)
@@ -153,7 +153,7 @@ describe("Single line toggle - without single line support ->", function()
     assert.are.same(expected_output, buffer_content)
   end)
   it("uncomments line: single row - with whitespace", function()
-    local input = { "  /*margin-left: auto;*/" }
+    local input = { "  /* margin-left: auto; */" }
     local expected_output = { "  margin-left: auto;" }
     buffer_setup("css", input)
     press_toggle_line(1)
