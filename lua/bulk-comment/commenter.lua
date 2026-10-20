@@ -69,7 +69,6 @@ function Commenter:is_commented(line, num_whitespace)
   return false
 end
 
--- TODO: rewrite it with `nvim_buf_set_text`
 ---@param line string
 ---@param row integer
 ---@param num_whitespace integer
@@ -80,7 +79,7 @@ function Commenter:add_comment(line, row, num_whitespace)
   else
     local endpos = line:len()
     local padded_open_symbol = self.config.block_comment[1] .. " "
-    local padded_close_symbol = " ".. self.config.block_comment[2]
+    local padded_close_symbol = " " .. self.config.block_comment[2]
     vim.api.nvim_buf_set_text(0, row_num, endpos, row_num, endpos, { padded_close_symbol })
     vim.api.nvim_buf_set_text(0, row_num, num_whitespace, row_num, num_whitespace, { padded_open_symbol })
   end
@@ -163,17 +162,17 @@ function Commenter:block_toggle_comment()
   end
 
   if self.config.block_comment then
-    vim.api.nvim_buf_set_lines(0, self:to_zero_based(visual_from), self:to_zero_based(visual_from), true,
-      { self.config.block_comment[1] })
-    vim.api.nvim_buf_set_lines(0, self:to_zero_based(visual_to + 2), self:to_zero_based(visual_to + 2), true,
-      { self.config.block_comment[2] })
-    local total_row_num = vim.api.nvim_buf_line_count(0) -- gives 1-based count
+    local start_idx = self:to_zero_based(visual_from)
+    local end_idx = self:to_zero_based(visual_to) + 1 -- line after the last selected one
+
+    vim.api.nvim_buf_set_lines(0, end_idx, end_idx, true, { self.config.block_comment[2] })
+    vim.api.nvim_buf_set_lines(0, start_idx, start_idx, true, { self.config.block_comment[1] })
+
     local rows_added = #self.config.block_comment
-    if visual_to + rows_added ~= total_row_num then
-      vim.api.nvim_win_set_cursor(0, { visual_to + rows_added + 1, 0 }) -- uses 1-based count
-    else
-      vim.api.nvim_win_set_cursor(0, { visual_to + rows_added, 0 })
-    end
+    local closing_row = visual_to + rows_added
+    local total_row_num = vim.api.nvim_buf_line_count(0) -- gives 1-based count
+    local target_row = math.min(closing_row + 1, total_row_num)
+    vim.api.nvim_win_set_cursor(0, { target_row, 0 }) -- uses 1-based count
   else
     for i = visual_from, visual_to do
       vim.api.nvim_win_set_cursor(0, { i, 0 })
