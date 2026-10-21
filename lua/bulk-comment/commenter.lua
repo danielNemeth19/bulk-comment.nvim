@@ -119,7 +119,7 @@ function Commenter:toggle_comment()
   local line = vim.api.nvim_get_current_line()
   local row, _ = table.unpack(vim.api.nvim_win_get_cursor(0))
   if self:is_empty_row(line) then
-    vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+    self:move_cursor(row, 0)
     return
   end
 
@@ -129,10 +129,7 @@ function Commenter:toggle_comment()
   else
     self:remove_comment(line, row, num_whitespace)
   end
-  local total_row_num = vim.api.nvim_buf_line_count(0)
-  if row ~= total_row_num then
-    vim.api.nvim_win_set_cursor(0, { row + 1, num_whitespace })
-  end
+  self:move_cursor(row, 0)
 end
 
 ---@protected
@@ -147,6 +144,16 @@ end
 ---@return integer
 function Commenter:to_zero_based(row_num)
   return row_num - 1
+end
+
+---Moves the cursor to the line after `row`, or keeps it on the last line
+---@param row integer # 1-based row
+---@param col integer # 0-based column
+function Commenter:move_cursor(row, col)
+  local next_row = row + 1
+  local last_row = vim.api.nvim_buf_line_count(0)
+  local target_row = math.min(next_row, last_row)
+  vim.api.nvim_win_set_cursor(0, { target_row, col }) -- nvim_win_set_cursor api uses 1-based count
 end
 
 function Commenter:block_toggle_comment()
@@ -170,9 +177,7 @@ function Commenter:block_toggle_comment()
 
     local rows_added = #self.config.block_comment
     local closing_row = visual_to + rows_added
-    local total_row_num = vim.api.nvim_buf_line_count(0) -- gives 1-based count
-    local target_row = math.min(closing_row + 1, total_row_num)
-    vim.api.nvim_win_set_cursor(0, { target_row, 0 }) -- uses 1-based count
+    self:move_cursor(closing_row, 0)
   else
     for i = visual_from, visual_to do
       vim.api.nvim_win_set_cursor(0, { i, 0 })

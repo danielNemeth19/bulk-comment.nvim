@@ -87,7 +87,7 @@ describe("Single line toggle - with single line support ->", function()
     assert.are.same(expected_output, buffer_content)
   end)
   it("cursor positioning: cursor moved to next row", function()
-    local input = { "function myTest() int {", "myVar := 5" }
+    local input = { "function myTest() int {", "myVar := 5", "otherVar := 3" }
     buffer_setup("go", input)
     press_toggle_line(1)
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
@@ -104,13 +104,21 @@ describe("Single line toggle - with single line support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
   end)
-  it("empty row not modified, cursor moved to next row", function()
+  it("cursor positioning: empty row not modified, cursor moved to next row", function()
     local input = {"local plugin = require('my-module')", "", "print(a)"}
     buffer_setup("lua", input)
     press_toggle_line(2)
     local buffer_content = get_lines_from_buffer()
     assert.are.same(input, buffer_content)
     assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
+  end)
+  it("cursor positioning: if empty line is last line, cursor stays on last row", function()
+    local input = {"local plugin = require('my-module')", ""}
+    buffer_setup("lua", input)
+    press_toggle_line(2)
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(input, buffer_content)
+    assert.equals(2, vim.api.nvim_win_get_cursor(0)[1])
   end)
 end)
 
@@ -178,7 +186,7 @@ describe("Single line toggle - without single line support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
   end)
-  it("empty row not modified, cursor moved to next row", function()
+  it("cursor positioning: empty row not modified, cursor moved to next row", function()
     local input = {
       "    </container>",
       "",
@@ -190,6 +198,17 @@ describe("Single line toggle - without single line support ->", function()
     local buffer_content = get_lines_from_buffer()
     assert.are.same(input, buffer_content)
     assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
+  end)
+  it("cursor positioning: if emtpy line is last line, cursor stays on last row", function()
+    local input = {
+      "    </container>",
+      "",
+    }
+    buffer_setup("html", input)
+    press_toggle_line(2)
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(input, buffer_content)
+    assert.equals(2, vim.api.nvim_win_get_cursor(0)[1])
   end)
 end)
 
