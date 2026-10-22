@@ -199,7 +199,7 @@ describe("Single line toggle - without single line support ->", function()
     assert.are.same(input, buffer_content)
     assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
   end)
-  it("cursor positioning: if emtpy line is last line, cursor stays on last row", function()
+  it("cursor positioning: if empty line is last line, cursor stays on last row", function()
     local input = {
       "    </container>",
       "",
@@ -391,6 +391,24 @@ describe("Block toggle - without block comment support ->", function()
     press_block_toggle()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
+  end)
+  it("cursor positioning: selection ending on an empty last row does not error", function ()
+    local input = { "sys.exit(3)", ""}
+    local expected_output = {"# sys.exit(3)", "" }
+    buffer_setup("python", input)
+    highlight_lines_manually(1, "down", 1)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+  end)
+  it("empty rows inside selection are left untouched", function ()
+    local input = {"import functools", "", "import pandas as pd"}
+    local expected_output = {"# import functools", "", "# import pandas as pd"}
+    buffer_setup("python", input)
+    highlight_lines_manually(1, "down", 2)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
   end)
   it("entering-leaving visual mode before trigger should be handled", function()
     local input = {"import functools", "import pandas as pd"}
