@@ -11,11 +11,11 @@ Commenter.__index = Commenter
 ---@return Commenter
 ---@param filetype string
 function Commenter:new(filetype)
-  local self = setmetatable({}, Commenter)
-  self.__index = self
-  self.filetype = filetype
-  self.config = self:_set_config(symbolMap)
-  return self
+  local instance = setmetatable({}, self)
+  instance.__index = instance
+  instance.filetype = filetype
+  instance.config = instance:_set_config(symbolMap)
+  return instance
 end
 
 --- @param map SymbolMap

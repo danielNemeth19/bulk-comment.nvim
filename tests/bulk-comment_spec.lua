@@ -2,8 +2,8 @@ local assert = require("luassert.assert")
 
 local function buffer_setup(filetype, input)
   local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(buf, "filetype", filetype)
-  vim.api.nvim_command("buffer " .. buf)
+  vim.bo[buf].filetype = filetype
+  vim.api.nvim_set_current_buf(buf)
   vim.api.nvim_buf_set_lines(0, 0, -1, true, input)
 end
 
