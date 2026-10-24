@@ -156,6 +156,17 @@ function Commenter:move_cursor(row, col)
   vim.api.nvim_win_set_cursor(0, { target_row, col }) -- nvim_win_set_cursor api uses 1-based count
 end
 
+---@param start_idx integer
+---@param end_idx integer
+---@return boolean
+function Commenter:is_block_commented(start_idx, end_idx)
+  local first_line = vim.api.nvim_buf_get_lines(0, start_idx, start_idx + 1, true)
+  local end_line = vim.api.nvim_buf_get_lines(0, end_idx, end_idx + 1, true)
+  local open_comment = self.config.block_comment[1]
+  local close_comment = self.config.block_comment[2]
+  return first_line[1] == open_comment and end_line[1] == close_comment
+end
+
 function Commenter:block_toggle_comment()
   local visual_started_at = self:_get_line_position("v")
   local cursor_at = self:_get_line_position(".")
@@ -170,8 +181,12 @@ function Commenter:block_toggle_comment()
 
   if self.config.block_comment then
     local start_idx = self:to_zero_based(visual_from)
-    local end_idx = self:to_zero_based(visual_to) + 1 -- line after the last selected one
+    local visual_end_idx = self:to_zero_based(visual_to)
+    if self:is_block_commented(self:to_zero_based(visual_from), self:to_zero_based(visual_to)) then
+      print("this will be need to uncommented")
+    end
 
+    local end_idx = visual_end_idx + 1 -- line after the last selected one
     vim.api.nvim_buf_set_lines(0, end_idx, end_idx, true, { self.config.block_comment[2] })
     vim.api.nvim_buf_set_lines(0, start_idx, start_idx, true, { self.config.block_comment[1] })
 

@@ -273,6 +273,25 @@ describe("Block toggle - with block comment support ->", function()
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
+
+  it("uncomments selection: visual inner paragraph", function()
+    local input = {
+      "/*",
+      "#include <stdlib.h>",
+      "#include <string.h>",
+      "#include <snekobject.h>",
+      "*/",
+    }
+    local expected_output = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
+    buffer_setup("c", input)
+    highlight_paragraph(1)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+    local mode = vim.api.nvim_get_mode().mode
+    assert.equals(mode, "n")
+  end)
+
   it("mode handling: visual mode -> normal mode", function()
     local input = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
     buffer_setup("c", input)
