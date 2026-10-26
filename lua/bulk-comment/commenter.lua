@@ -156,8 +156,8 @@ function Commenter:move_cursor(row, col)
   vim.api.nvim_win_set_cursor(0, { target_row, col }) -- nvim_win_set_cursor api uses 1-based count
 end
 
----@param start_idx integer
----@param end_idx integer
+---@param start_idx integer -- 0-based start idx of visual block
+---@param end_idx integer -- 0-based end idx of visual block
 ---@return boolean
 function Commenter:is_block_commented(start_idx, end_idx)
   local first_line = vim.api.nvim_buf_get_lines(0, start_idx, start_idx + 1, true)
@@ -165,6 +165,21 @@ function Commenter:is_block_commented(start_idx, end_idx)
   local open_comment = self.config.block_comment[1]
   local close_comment = self.config.block_comment[2]
   return first_line[1] == open_comment and end_line[1] == close_comment
+end
+
+---@param start_idx integer -- 0-based start idx of visual block
+---@param end_idx integer -- 0-based end idx of visual block
+function Commenter:add_block_comment(start_idx, end_idx)
+  local close_idx = end_idx + 1 -- line after the last selected one
+  vim.api.nvim_buf_set_lines(0, close_idx, close_idx, true, { self.config.block_comment[2] })
+  vim.api.nvim_buf_set_lines(0, start_idx, start_idx, true, { self.config.block_comment[1] })
+end
+
+---@param start_idx integer -- 0-based start idx of visual block
+---@param end_idx integer -- 0-based end idx of visual block
+function Commenter:remove_block_comment_lines(start_idx, end_idx)
+  vim.api.nvim_buf_set_lines(0, end_idx, end_idx + 1, true, {})
+  vim.api.nvim_buf_set_lines(0, start_idx, start_idx + 1, true, { })
 end
 
 function Commenter:block_toggle_comment()
@@ -181,18 +196,15 @@ function Commenter:block_toggle_comment()
 
   if self.config.block_comment then
     local start_idx = self:to_zero_based(visual_from)
-    local visual_end_idx = self:to_zero_based(visual_to)
-    if self:is_block_commented(self:to_zero_based(visual_from), self:to_zero_based(visual_to)) then
-      print("this will be need to uncommented")
+    local end_idx = self:to_zero_based(visual_to)
+    if not self:is_block_commented(start_idx, end_idx) then
+      self:add_block_comment(start_idx, end_idx)
+      local rows_added = #self.config.block_comment
+      local closing_row = visual_to + rows_added
+      self:move_cursor(closing_row, 0)
+    else
+      self:remove_block_comment_lines(start_idx, end_idx)
     end
-
-    local end_idx = visual_end_idx + 1 -- line after the last selected one
-    vim.api.nvim_buf_set_lines(0, end_idx, end_idx, true, { self.config.block_comment[2] })
-    vim.api.nvim_buf_set_lines(0, start_idx, start_idx, true, { self.config.block_comment[1] })
-
-    local rows_added = #self.config.block_comment
-    local closing_row = visual_to + rows_added
-    self:move_cursor(closing_row, 0)
   else
     for i = visual_from, visual_to do
       vim.api.nvim_win_set_cursor(0, { i, 0 })
