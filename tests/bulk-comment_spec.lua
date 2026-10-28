@@ -323,6 +323,36 @@ describe("Block toggle - with block comment support ->", function()
     local mode = vim.api.nvim_get_mode().mode
     assert.equals(mode, "n")
   end)
+  it("uncomments selection: visual linewise + down", function()
+    local input = {
+      "#include <stdlib.h>",
+      "/*",
+      "#include <string.h>",
+      "#include <snekobject.h>",
+      "*/",
+    }
+    local expected_output = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
+    buffer_setup("c", input)
+    highlight_lines_manually(2, "down", 3)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+  end)
+  it("uncomments selection: visual linewise + up", function()
+    local input = {
+      "/*",
+      "#include <stdlib.h>",
+      "#include <string.h>",
+      "#include <snekobject.h>",
+      "*/",
+    }
+    local expected_output = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
+    buffer_setup("c", input)
+    highlight_lines_manually(5, "up", 4)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+  end)
   it("mode handling: visual mode -> normal mode", function()
     local input = { "#include <stdlib.h>", "#include <string.h>", "#include <snekobject.h>" }
     buffer_setup("c", input)
@@ -351,6 +381,29 @@ describe("Block toggle - with block comment support ->", function()
     press_block_toggle()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 5)
+  end)
+  it("cursor positioning uncomment: cursor moved after block commented block", function()
+    local input = {
+      "/*",
+      "godotenv.Load()",
+      "dbQueries := database.New(db)",
+      "*/",
+      "",
+      "serverMux := http.NewServeMux()"
+    }
+    buffer_setup("go", input)
+    highlight_lines_manually(1, "down", 3)
+    press_block_toggle()
+    local active_line = vim.api.nvim_win_get_cursor(0)[1]
+    assert.equals(active_line, 3)
+  end)
+  it("cursor positioning uncomment: cursor moved to the closing block comment if at the end of buffer", function()
+    local input = { "/*", "#include <stdlib.h>", "#include <string.h>", "*/" }
+    buffer_setup("c", input)
+    highlight_paragraph(1)
+    press_block_toggle()
+    local active_line = vim.api.nvim_win_get_cursor(0)[1]
+    assert.equals(active_line, 2)
   end)
 end)
 

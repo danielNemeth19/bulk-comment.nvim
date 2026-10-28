@@ -204,6 +204,9 @@ function Commenter:block_toggle_comment()
       self:move_cursor(closing_row, 0)
     else
       self:remove_block_comment_lines(start_idx, end_idx)
+      local rows_removed = #self.config.block_comment
+      local closing_row = visual_to - rows_removed
+      self:move_cursor(closing_row, 0)
     end
   else
     for i = visual_from, visual_to do
