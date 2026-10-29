@@ -462,6 +462,47 @@ describe("Block toggle - without block comment support ->", function()
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
   end)
+  it("uncomments selection: visual inner paragraph", function()
+    local input = {
+      "# def my_func(x, y):",
+      "    # z = x * y",
+      "    # return z",
+    }
+    local expected_output = { "def my_func(x, y):", "    z = x * y", "    return z" }
+    buffer_setup("python", input)
+    highlight_paragraph(1)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+    local mode = vim.api.nvim_get_mode().mode
+    assert.equals(mode, "n")
+  end)
+  it("uncomments selection: visual linewise + down", function()
+    local input = {
+      "def my_func(x, y):",
+      "    # z = x * y",
+      "    # return z",
+    }
+    local expected_output = { "def my_func(x, y):", "    z = x * y", "    return z" }
+    buffer_setup("python", input)
+    highlight_lines_manually(2, "down", 1)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+  end)
+  it("uncomments selection: visual linewise + up", function()
+    local input = {
+      "# def my_func(x, y):",
+      "    # z = x * y",
+      "    # return z",
+    }
+    local expected_output = { "def my_func(x, y):", "    z = x * y", "    return z" }
+    buffer_setup("python", input)
+    highlight_lines_manually(3, "up", 2)
+    press_block_toggle()
+    local buffer_content = get_lines_from_buffer()
+    assert.are.same(expected_output, buffer_content)
+  end)
   it("mode handling: visual mode -> normal mode", function()
     local input = {
       "# def my_func(x, y):",
@@ -503,6 +544,7 @@ describe("Block toggle - without block comment support ->", function()
     press_block_toggle()
     local buffer_content = get_lines_from_buffer()
     assert.are.same(expected_output, buffer_content)
+    assert.equals(2, vim.api.nvim_win_get_cursor(0)[1])
   end)
   it("empty rows inside selection are left untouched", function ()
     local input = {"import functools", "", "import pandas as pd"}

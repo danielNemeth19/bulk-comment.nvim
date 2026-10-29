@@ -92,7 +92,7 @@ function Commenter:remove_comment(line, row, num_whitespace)
   if type(self.config.line_comment) == "string" then
     self:remove_inline_comment(row, num_whitespace)
   else
-    self:remove_block_comment(line, row, num_whitespace)
+    self:remove_inline_block_comment(line, row, num_whitespace)
   end
 end
 
@@ -105,7 +105,7 @@ function Commenter:remove_inline_comment(row, num_whitespace)
   vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, { "" })
 end
 
-function Commenter:remove_block_comment(line, row, num_whitespace)
+function Commenter:remove_inline_block_comment(line, row, num_whitespace)
   local row_num = self:to_zero_based(row)
   local open_len = self.config.block_comment[1]:len() + 1
   local close_len = self.config.block_comment[2]:len() + 1
@@ -179,7 +179,7 @@ end
 ---@param end_idx integer -- 0-based end idx of visual block
 function Commenter:remove_block_comment_lines(start_idx, end_idx)
   vim.api.nvim_buf_set_lines(0, end_idx, end_idx + 1, true, {})
-  vim.api.nvim_buf_set_lines(0, start_idx, start_idx + 1, true, { })
+  vim.api.nvim_buf_set_lines(0, start_idx, start_idx + 1, true, {})
 end
 
 function Commenter:block_toggle_comment()
