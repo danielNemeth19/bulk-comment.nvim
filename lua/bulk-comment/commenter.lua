@@ -3,25 +3,23 @@ table.unpack = table.unpack or unpack
 local symbolMap = require("bulk-comment.config")
 
 ---@class Commenter
----@field filetype string
 ---@field config LanguageConfig
 local Commenter = {}
 Commenter.__index = Commenter
 
----@return Commenter
----@param filetype string
-function Commenter:new(filetype)
-  local instance = setmetatable({}, self)
-  instance.__index = instance
-  instance.filetype = filetype
-  instance.config = instance:_set_config(symbolMap)
-  return instance
+function Commenter.new(filetype)
+  if not Commenter.is_supported(filetype) then
+    return nil
+  end
+  return setmetatable({ config = symbolMap[filetype] }, Commenter)
 end
 
---- @param map SymbolMap
-function Commenter:_set_config(map)
-  local config = map[self.filetype]
-  return config
+function Commenter.is_supported(filetype)
+  return symbolMap[filetype] ~= nil
+end
+
+function Commenter.supported_languages()
+  return vim.tbl_keys(symbolMap)
 end
 
 --- @param line string

@@ -1,5 +1,25 @@
 local assert = require("luassert.assert")
 
+local toggle_line = "lc"
+local toggle_block = "vc"
+local custom_opts = {
+  keymaps = {
+    line_comment = toggle_line,
+    block_comment = toggle_block
+  }
+}
+
+local function press_toggle_line(line)
+  vim.api.nvim_win_set_cursor(0, { line, 0 })
+  local keypress = vim.api.nvim_replace_termcodes(toggle_line, true, false, true)
+  vim.api.nvim_feedkeys(keypress, "x", false)
+end
+
+local function press_block_toggle()
+  local keypress = vim.api.nvim_replace_termcodes(toggle_block, true, false, true)
+  vim.api.nvim_feedkeys(keypress, "x", false)
+end
+
 local function buffer_setup(filetype, input)
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].filetype = filetype
@@ -39,15 +59,9 @@ local function get_lines_from_buffer()
 end
 
 describe("Single line toggle - with single line support ->", function()
-  local line_toggle_keymap = "lc"
-  local function press_toggle_line(line)
-    vim.api.nvim_win_set_cursor(0, { line, 0 })
-    local keypress = vim.api.nvim_replace_termcodes(line_toggle_keymap, true, false, true)
-    vim.api.nvim_feedkeys(keypress, "x", false)
-  end
   before_each(function()
     local plugin = require("bulk-comment")
-    vim.keymap.set("n", line_toggle_keymap, plugin.toggle, { desc = "testing line commenting" })
+    plugin.setup(custom_opts)
   end)
   it("can require", function()
     require("bulk-comment")
@@ -105,7 +119,7 @@ describe("Single line toggle - with single line support ->", function()
     assert.equals(active_line, 3)
   end)
   it("cursor positioning: empty row not modified, cursor moved to next row", function()
-    local input = {"local plugin = require('my-module')", "", "print(a)"}
+    local input = { "local plugin = require('my-module')", "", "print(a)" }
     buffer_setup("lua", input)
     press_toggle_line(2)
     local buffer_content = get_lines_from_buffer()
@@ -113,7 +127,7 @@ describe("Single line toggle - with single line support ->", function()
     assert.equals(3, vim.api.nvim_win_get_cursor(0)[1])
   end)
   it("cursor positioning: if empty line is last line, cursor stays on last row", function()
-    local input = {"local plugin = require('my-module')", ""}
+    local input = { "local plugin = require('my-module')", "" }
     buffer_setup("lua", input)
     press_toggle_line(2)
     local buffer_content = get_lines_from_buffer()
@@ -123,15 +137,9 @@ describe("Single line toggle - with single line support ->", function()
 end)
 
 describe("Single line toggle - without single line support ->", function()
-  local line_toggle_keymap = "lc"
-  local function press_toggle_line(line)
-    vim.api.nvim_win_set_cursor(0, { line, 0 })
-    local keypress = vim.api.nvim_replace_termcodes(line_toggle_keymap, true, false, true)
-    vim.api.nvim_feedkeys(keypress, "x", false)
-  end
   before_each(function()
     local plugin = require("bulk-comment")
-    vim.keymap.set("n", line_toggle_keymap, plugin.toggle, { desc = "testing line commenting" })
+    plugin.setup(custom_opts)
   end)
   it("can require", function()
     require("bulk-comment")
@@ -213,15 +221,9 @@ describe("Single line toggle - without single line support ->", function()
 end)
 
 describe("Block toggle - with block comment support ->", function()
-  local block_toggle_keymap = "vc"
-  local function press_block_toggle()
-    local keypress = vim.api.nvim_replace_termcodes(block_toggle_keymap, true, false, true)
-    vim.api.nvim_feedkeys(keypress, "x", false)
-  end
   before_each(function()
     local plugin = require("bulk-comment")
-    vim.keymap.set("v", block_toggle_keymap, plugin.block_toggle, { desc = "testing bulk commenting" })
-    require("bulk-comment")
+    plugin.setup(custom_opts)
   end)
   it("can require", function()
     require("bulk-comment")
@@ -408,15 +410,9 @@ describe("Block toggle - with block comment support ->", function()
 end)
 
 describe("Block toggle - without block comment support ->", function()
-  local block_toggle_keymap = "vc"
-  local function press_block_toggle()
-    local keypress = vim.api.nvim_replace_termcodes(block_toggle_keymap, true, false, true)
-    vim.api.nvim_feedkeys(keypress, "x", false)
-  end
   before_each(function()
     local plugin = require("bulk-comment")
-    vim.keymap.set("v", block_toggle_keymap, plugin.block_toggle, { desc = "testing bulk commenting" })
-    require("bulk-comment")
+    plugin.setup(custom_opts)
   end)
   it("can require", function()
     require("bulk-comment")
@@ -536,9 +532,9 @@ describe("Block toggle - without block comment support ->", function()
     local active_line = vim.api.nvim_win_get_cursor(0)[1]
     assert.equals(active_line, 3)
   end)
-  it("cursor positioning: selection ending on an empty last row does not error", function ()
-    local input = { "sys.exit(3)", ""}
-    local expected_output = {"# sys.exit(3)", "" }
+  it("cursor positioning: selection ending on an empty last row does not error", function()
+    local input = { "sys.exit(3)", "" }
+    local expected_output = { "# sys.exit(3)", "" }
     buffer_setup("python", input)
     highlight_lines_manually(1, "down", 1)
     press_block_toggle()
@@ -546,9 +542,9 @@ describe("Block toggle - without block comment support ->", function()
     assert.are.same(expected_output, buffer_content)
     assert.equals(2, vim.api.nvim_win_get_cursor(0)[1])
   end)
-  it("empty rows inside selection are left untouched", function ()
-    local input = {"import functools", "", "import pandas as pd"}
-    local expected_output = {"# import functools", "", "# import pandas as pd"}
+  it("empty rows inside selection are left untouched", function()
+    local input = { "import functools", "", "import pandas as pd" }
+    local expected_output = { "# import functools", "", "# import pandas as pd" }
     buffer_setup("python", input)
     highlight_lines_manually(1, "down", 2)
     press_block_toggle()
@@ -556,7 +552,7 @@ describe("Block toggle - without block comment support ->", function()
     assert.are.same(expected_output, buffer_content)
   end)
   it("entering-leaving visual mode before trigger should be handled", function()
-    local input = {"import functools", "import pandas as pd"}
+    local input = { "import functools", "import pandas as pd" }
     local expected_output = {
       "# import functools",
       "# import pandas as pd",
