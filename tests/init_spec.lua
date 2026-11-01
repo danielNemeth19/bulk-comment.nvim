@@ -1,6 +1,4 @@
 local assert = require("luassert.assert")
-local stub = require("luassert.stub")
-local commenter = require("bulk-comment.commenter")
 
 local function buffer_setup(filetype)
   local buf = vim.api.nvim_create_buf(false, true)
@@ -14,14 +12,40 @@ local function buffer_map(mode, lhs)
 end
 
 describe("testing init", function()
-  before_each(function()
-    print('lets see')
-  end)
-  it("first", function()
+  it("creates toggle comment keymap", function()
     local plugin = require("bulk-comment")
     plugin.setup({})
     buffer_setup("python")
     local map = buffer_map("n", "<C-q>")
     assert.is_not_nil(map)
+  end)
+  it("creates block toggle comment keymap", function()
+    local plugin = require("bulk-comment")
+    plugin.setup({})
+    buffer_setup("python")
+    local map = buffer_map("x", "<C-q>")
+    assert.is_not_nil(map)
+  end)
+  it("does not create Commenter if fileype is unsupported", function()
+    local plugin = require("bulk-comment")
+    plugin.setup({})
+    buffer_setup("not-supported-filetype")
+    assert.is_nil(buffer_map("n", "<C-q>"))
+    assert.is_nil(buffer_map("x", "<C-q>"))
+  end)
+  it("creates Commenter with custom config", function ()
+    local custom_opts = {
+      keymaps = {
+        line_comment = "lc",
+        block_comment = "bc"
+      }
+    }
+    local plugin = require("bulk-comment")
+    plugin.setup(custom_opts)
+    buffer_setup("c")
+    assert.is_not_nil(buffer_map("n", "lc"))
+    assert.is_not_nil(buffer_map("x", "bc"))
+    assert.is_nil(buffer_map("n", "<C-q>"))
+    assert.is_nil(buffer_map("x", "<C-q>"))
   end)
 end)

@@ -20,6 +20,8 @@ function M.setup(opts)
     callback = function(args)
       local commenter = Commenter.new(args.match)
 
+      -- leaving here as fallback - in real life
+      -- the `supported_languages` pattern ensures that commenter is never nil
       if not commenter then
         vim.api.nvim_echo({ { "Not yet supported: " .. args.match } }, true, { err = false })
         return
@@ -27,10 +29,10 @@ function M.setup(opts)
 
       vim.keymap.set("n", options.keymaps.line_comment, function()
         commenter:toggle_comment()
-      end, { buffer = args.buf, nowait = true })
+      end, { buffer = args.buf, desc = "Toggle comment"} )
       vim.keymap.set("x", options.keymaps.block_comment, function()
         commenter:block_toggle_comment()
-      end, { buffer = args.buf })
+      end, { buffer = args.buf, desc = "Toggle block comment" })
     end
   })
 end

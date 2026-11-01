@@ -1,11 +1,10 @@
 -- for tests look at: https://github.com/terrortylor/nvim-comment
 local assert = require("luassert.assert")
-local mock = require("luassert.mock")
 
 
 describe("commenter class", function()
   local function new_commenter(filetype)
-    -- used here to suppress 'need check nill'
+    -- used here to suppress 'need check nil'
     -- for new instance creation without being forced
     -- to handle null cases
     return assert(Commenter.new(filetype))
